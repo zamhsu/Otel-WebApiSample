@@ -2,6 +2,8 @@ using System.Reflection;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OtelSample.Repository;
+using OtelSample.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,25 +14,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
+builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+
 // 反射取得服務相關的類別庫名稱
 var serviceName = Assembly.GetEntryAssembly()?.GetName().Name;
 var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
 
-var prefix = "OtelSample";
+var componentPrefix = "OtelSample";
 
-var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(q => q.GetName().Name.StartsWith(prefix));
+var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(q => q.GetName().Name.StartsWith(componentPrefix));
 var sources = assemblies.Select(q => q.GetName().Name);
-foreach (var source in sources)
-{
-    Console.WriteLine(source);
-}
 
 // tracing
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
         tracerProviderBuilder
-            .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService(serviceName, serviceVersion: serviceVersion))
+            .SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService(serviceName, serviceVersion: serviceVersion))
             .AddSource(sources.ToArray())
             .AddAspNetCoreInstrumentation(options =>
             {
@@ -47,7 +51,7 @@ builder.Services.AddOpenTelemetry()
             })
             .AddOtlpExporter(cfg =>
             {
-                cfg.Endpoint = new Uri("http://localhost");
+                cfg.Endpoint = new Uri("http://localhost:4317");
                 cfg.Protocol = OtlpExportProtocol.Grpc;
             })
             .AddConsoleExporter());

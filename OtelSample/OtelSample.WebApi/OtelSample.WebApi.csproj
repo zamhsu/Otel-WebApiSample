@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OtelSample.Common\OtelSample.Common.csproj" />
       <ProjectReference Include="..\OtelSample.Service\OtelSample.Service.csproj" />
     </ItemGroup>
 

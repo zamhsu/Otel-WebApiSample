@@ -6,9 +6,4 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\OtelSample.Common\OtelSample.Common.csproj" />
-      <ProjectReference Include="..\OtelSample.Repository\OtelSample.Repository.csproj" />
-    </ItemGroup>
-
 </Project>
