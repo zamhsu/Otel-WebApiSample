@@ -6,6 +6,7 @@ using OtelSample.WebApi.Models;
 
 namespace OtelSample.WebApi.Controllers;
 
+[Tracing]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
@@ -22,11 +23,10 @@ public class WeatherForecastController : ControllerBase
         _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
-
+    
     [HttpGet(Name = "GetWeatherForecast")]
-    public async Task<IEnumerable<WeatherForecastOutputModel>> GetAsync()
+    public async Task<IEnumerable<WeatherForecastOutputModel>> GetAllAsync()
     {
-        using var activity = Instrumentation.WebApiActivitySource.StartActivity("OtelSample.WebApi.WeatherForecastController.GetAsync");
         using var httpClient = _httpClientFactory.CreateClient();
         
         Task getFirst = httpClient.GetAsync("https://test.k6.io");

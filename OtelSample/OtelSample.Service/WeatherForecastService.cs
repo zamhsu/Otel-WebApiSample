@@ -5,6 +5,7 @@ using OtelSample.Service.Dto;
 
 namespace OtelSample.Service;
 
+[Tracing]
 public class WeatherForecastService : IWeatherForecastService
 {
     private readonly IWeatherForecastRepository _weatherForecastRepository;
@@ -16,7 +17,6 @@ public class WeatherForecastService : IWeatherForecastService
 
     public IEnumerable<WeatherForecastDto> GetAll()
     {
-        using var activity = Instrumentation.ServiceActivitySource.StartActivity("OtelSample.Service.WeatherForecastService.GetAll");
         var data = _weatherForecastRepository.GetAll();
 
         return Mapper(data);

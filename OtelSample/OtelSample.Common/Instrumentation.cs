@@ -1,16 +1,30 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace OtelSample.Common;
 
 public static class Instrumentation
 {
-    private static readonly string RepositoryActivitySourceName = "OtelSample.Repository";
-    private static readonly string ServiceActivitySourceName = "OtelSample.Service";
-    private static readonly string WebApiActivitySourceName = "OtelSample.WebApi";
+    private static ActivitySource _activitySource;
 
-    public static ActivitySource RepositoryActivitySource { get; private set; } = new ActivitySource(RepositoryActivitySourceName);
+    public static Activity StartActivity(string activityName)
+    {
+        var componentName = Assembly.GetCallingAssembly().GetName().Name;
 
-    public static ActivitySource ServiceActivitySource { get; private set; } = new ActivitySource(ServiceActivitySourceName);
+        var activity = StartActivity(componentName, activityName);
+
+        return activity;
+    }
     
-    public static ActivitySource WebApiActivitySource { get; private set; } = new ActivitySource(WebApiActivitySourceName);
+    public static Activity StartActivity(string componentName, string activityName)
+    {
+        if (_activitySource is null)
+        {
+            _activitySource = new ActivitySource(componentName);
+        }
+
+        var activity = _activitySource.StartActivity(activityName);
+        
+        return activity;
+    }
 }

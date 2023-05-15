@@ -3,12 +3,11 @@ using OtelSample.Repository.Models;
 
 namespace OtelSample.Repository;
 
+[Tracing]
 public class WeatherForecastRepository : IWeatherForecastRepository
 {
     public IEnumerable<WeatherForecast> GetAll()
     {
-        using var activity = Instrumentation.RepositoryActivitySource.StartActivity("OtelSample.Repository.WeatherForecastRepository.GetAll");
-
         return GetFakeData();
     }
 
