@@ -5,26 +5,27 @@ namespace OtelSample.Common;
 
 public static class Instrumentation
 {
-    private static ActivitySource _activitySource;
+    private static readonly List<ActivitySource> ActivitySources = new List<ActivitySource>();
 
-    public static Activity StartActivity(string activityName)
-    {
-        var componentName = Assembly.GetCallingAssembly().GetName().Name;
-
-        var activity = StartActivity(componentName, activityName);
-
-        return activity;
-    }
-    
     public static Activity StartActivity(string componentName, string activityName)
     {
-        if (_activitySource is null)
-        {
-            _activitySource = new ActivitySource(componentName);
-        }
+        var activitySource = GetActivitySource(componentName);
 
-        var activity = _activitySource.StartActivity(activityName);
+        var activity = activitySource.StartActivity(activityName);
         
         return activity;
+    }
+
+    private static ActivitySource GetActivitySource(string activityName)
+    {
+        var activitySource = ActivitySources.FirstOrDefault(q => q.Name.Contains(activityName));
+
+        if (activitySource is null)
+        {
+            activitySource = new ActivitySource(activityName);
+            ActivitySources.Add(activitySource);
+        }
+
+        return activitySource;
     }
 }
