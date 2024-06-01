@@ -1,5 +1,6 @@
 using System.Reflection;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OtelSample.Repository;
@@ -55,6 +56,19 @@ builder.Services.AddOpenTelemetry()
                 cfg.Protocol = OtlpExportProtocol.Grpc;
             })
             .AddConsoleExporter());
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(meterProvider => meterProvider
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddPrometheusExporter()
+        .AddOtlpExporter(cfg =>
+        {
+            cfg.Endpoint = new Uri("http://localhost:4317");
+            cfg.Protocol = OtlpExportProtocol.Grpc;
+        })
+        .AddConsoleExporter());
 
 var app = builder.Build();
 
